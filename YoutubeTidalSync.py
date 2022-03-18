@@ -52,10 +52,16 @@ class Song(object):
             return True
         elif (self is None) or (other is None):
             return False
-        if (songTitleCompare(self.title, other.title)) and (simplifyString(self.artist.casefold()) == simplifyString(other.artist.casefold())):
-            return True
+        titleMatch = (songTitleCompare(self.title, other.title)) 
+        albumMatch = False
+        if simplifyString(self.artist.casefold()) == simplifyString(other.artist.casefold()): 
+            albumMatch = True
+        elif simplifyString(self.artist.casefold()) in other.title.casefold():
+            albumMatch = True
+        elif simplifyString(other.artist.casefold()) in self.title.casefold():
+            albumMatch = True
 
-        return False
+        return titleMatch and albumMatch
 
     def __hash__(self):
         return hash(tuple(self))
@@ -184,13 +190,13 @@ def addMissingLikedSongToTidal(tidalSession, missingSong):
     userFavorites = currentUser.favorites
     # Check for song before adding, the seach might have cleaned up the title (TODO: throw error instead of True)
     titalSongs = getLikedTitalSongs(tidalSession)
-    if missingSong in titalSongs:
+    if missingSong in titalSongs: #TODO: this needs more testing
         print("Tried to add {",missingSong,"} to Tidal favorites but already added")
         return True
 
     print("Tidal is Missing {",missingSong,"} in favorites")
     print("Adding {",tidalSong,"} to Tidal favorites")
-    userFavorites.add_track(tidalSong.tidalId)
+    #userFavorites.add_track(tidalSong.tidalId)
     return True
 
 def getMissingLiked(ytmusicClient, tidalSession): 
